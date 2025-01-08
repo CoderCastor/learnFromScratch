@@ -1,11 +1,15 @@
 import express, { Request, Response } from "express";
 import {
+  googleLogin,
   loginUser,
   registerUser,
+  updateUser,
+  updateUserPassword,
   uploadImage,
 } from "../controllers/userControllers";
 import multer from "multer";
 import path from "node:path";
+import authenticate from "../middlewares/authentication";
 
 const userRouter = express.Router();
 
@@ -22,12 +26,19 @@ userRouter.get("/", (req: Request, res: Response) => {
   });
 });
 
+//for registering user
 userRouter.post("/register", registerUser);
+
+//register and login user with google
+userRouter.post("/google-login", googleLogin);
+
+//for login user
 userRouter.post("/login", loginUser);
 
 //for Profile Image Upload 
 userRouter.patch(
-  "/profileimg/:id",
+  "/profileimg",
+  authenticate,
   upload.fields([
     {
       name: "profileImage",
@@ -36,5 +47,11 @@ userRouter.patch(
   ]),
   uploadImage
 );
+
+//for updating information of user
+userRouter.patch('/update-user',authenticate,updateUser)
+
+//for updating password of user
+userRouter.patch('/update-user-password',authenticate,updateUserPassword)
 
 export default userRouter;
